@@ -1,0 +1,188 @@
+body {
+  font-family: "Lora", serif;
+  margin: 0;
+  padding-top: 125px;
+  padding-bottom: 50px;
+}
+
+body button,
+input,
+textarea {
+  font-family: inherit;
+}
+
+body > div {
+  margin: 10px;
+  padding: 5px;
+}
+
+.form-switch {
+  padding-top: 9px;
+}
+
+#loading-screen {
+  margin-top: 200px;
+}
+
+.preloader-wrapper {
+  margin: auto;
+  position: unset;
+  display: block;
+  height: 200px;
+  width: 200px;
+}
+
+.page-title {
+  font-size: 24px;
+  color: #fff;
+  z-index: 100;
+  padding: 12px 12px 0 12px;
+  position: fixed;
+  top: 0;
+  box-shadow: 0 3px 5px -1px rgb(0 0 0 / 20%), 0 6px 10px 0 rgb(0 0 0 / 14%), 0 1px 18px 0 rgb(0 0 0 / 12%);
+}
+
+.page-title.scrolled {
+  font-size: 18px;
+  padding: 8px 12px;
+  transition: all 1s ease;
+}
+
+.material-icons.new-release {
+  color: #d50000;
+  font-size: 20px;
+}
+
+footer {
+  background: antiquewhite;
+  float: left;
+  width: 100%;
+  text-align: center;
+  font-weight: 600;
+  position: fixed;
+  bottom: 0;
+  box-shadow: 0 -3px 5px -1px rgba(0, 0, 0, 0.2),
+    0 -6px 10px 0 rgba(0, 0, 0, 0.14), 0 -1px 18px 0 rgba(0, 0, 0, 0.12);
+  transition: all 1s ease;
+  display: flex;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom: 0;
+  justify-content: space-evenly;
+  z-index: 100;
+}
+
+footer p {
+  margin: 0.75rem;
+  transition: all 1s ease;
+}
+
+footer.scrolled p {
+  margin: 0.5rem;
+  transition: all 1s ease;
+}
+
+select {
+  display: block;
+}
+
+/**********************/
+/* RESPONSIVE SECTION */
+/**********************/
+
+@media only screen and (max-device-width: 767px) {
+  footer {
+    flex-direction: column;
+  }
+
+  footer p {
+    margin: 5px;
+    transition: all 1s ease;
+  }
+  
+  footer.scrolled p {
+    margin: 0.5px;
+    transition: all 1s ease;
+  }
+}
+
+/* SCROLL BAR CSS STARTS*/
+/* width */
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  border-radius: 15px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border: 3px solid transparent;
+  border-radius: 15px;
+  background-clip: content-box;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  border: 3px solid transparent;
+  border-radius: 15px;
+  background-clip: content-box;
+}
+/* SCROLL BAR CSS ENDS*/
+
+/* TOAST SNACKBAR CSS STARTS*/
+#snackbar {
+  visibility: hidden;    
+  position: fixed;
+  z-index: 1;
+  bottom: 35px;
+  display: flex;
+  width: 80%;
+  text-align: center;
+  border-radius: 2px;
+  font-size: 17px;
+  transform: translateX(12%);
+  margin: 0 auto;
+
+}
+
+#snackbar p{
+  background-color: #333;
+  color: #fff;
+  font-size: 16px;
+  padding: 10px 20px;
+  margin: 10px auto;
+  opacity: 0.95;
+  border-radius: 20px;
+}
+
+#snackbar.show {
+  visibility: visible;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@-webkit-keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+/* TOAST SNACKBAR CSS ENDS*/
