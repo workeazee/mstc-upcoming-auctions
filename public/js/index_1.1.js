@@ -13,36 +13,36 @@ function stopLoader() {
     $('#main').show();
 }
 
-// To update openedDataIds and add to local storage and refresh data in tables
+// To update openedDataIds and add to firebase realtime database and refresh data in tables
 function moveToOpened(e){
     var toastHTML = '<span>Link opened in new tab</span>';
     M.toast({html: toastHTML, classes: 'rounded blue-grey darken-2 z-depth-5', displayLength: 2000});
     var auctionId = e.getAttribute('auction-id');
     if (!openedDataIds.ids.includes(auctionId))
         openedDataIds.ids.push(auctionId);
-    localStorage.setItem('openedDataIds', JSON.stringify(openedDataIds));
+    updateOpenedDataIds();
     refreshData();
 }
 
-// To update starredDataIds and add to local storage and refresh data in tables
+// To update starredDataIds and add to firebase realtime database and refresh data in tables
 function moveToStarred(e){
     var toastHTML = '<span>Moved to starred auctions</span>';
     M.toast({html: toastHTML, classes: 'rounded blue-grey darken-2 z-depth-5', displayLength: 2000});
     var auctionId = e.getAttribute('auction-id');
     if (!starredDataIds.ids.includes(auctionId))
         starredDataIds.ids.push(auctionId);
-    localStorage.setItem('starredDataIds', JSON.stringify(starredDataIds));
+    updateStarredDataIds();
     refreshData();
 }
 
-// To update ignoredDataIds and add to local storage and refresh data in tables
+// To update ignoredDataIds and add to firebase realtime database and refresh data in tables
 function moveToIgnored(e){
     var toastHTML = '<span>Moved to ignored auctions</span>';
     M.toast({html: toastHTML, classes: 'rounded blue-grey darken-2 z-depth-5', displayLength: 2000});
     var auctionId = e.getAttribute('auction-id');
     if (!ignoredDataIds.ids.includes(auctionId))
         ignoredDataIds.ids.push(auctionId);
-    localStorage.setItem('ignoredDataIds', JSON.stringify(ignoredDataIds));
+    updateIgnoredDataIds();
     refreshData();
 }
         
@@ -203,55 +203,73 @@ function populateIgnoredTableWithData(){
     });
 }
 
-$(document).ready(function () {
-    $('.tabs').tabs(); // To call materialize tabs
-
-    // Initilaise data in local storage
-    if(!localStorage.getItem('starredDataIds'))
-        localStorage.setItem('starredDataIds', '{"ids":[]}');
-    if(!localStorage.getItem('openedDataIds'))
-        localStorage.setItem('openedDataIds', '{"ids":[]}');
-    if(!localStorage.getItem('ignoredDataIds'))
-        localStorage.setItem('ignoredDataIds', '{"ids":[]}');
-    starredDataIds = JSON.parse(localStorage.getItem('starredDataIds'));
-    openedDataIds = JSON.parse(localStorage.getItem('openedDataIds'));
-    ignoredDataIds = JSON.parse(localStorage.getItem('ignoredDataIds'));
-
-    // To fetch all auctions from MSTC and then execute inner method
+function callToFetchAllAuctions() {
+    $('#modal').modal('close'); 
     $.when(fetchAllAuctions()).then(function() {
-        // Clean up local storage if id is not present in current data auctions
+        openedDataIds = userDetails.openedDataIds || {ids: []};
+        starredDataIds = userDetails.starredDataIds || {ids: []};
+        ignoredDataIds = userDetails.ignoredDataIds || {ids: []};
+
+        // Clean up firebase realtime database if id is not present in current data auctions
         openedDataIds.ids = openedDataIds.ids.filter((id) => lastestDataIds.includes(id));
         starredDataIds.ids = starredDataIds.ids.filter((id) => lastestDataIds.includes(id));
         ignoredDataIds.ids = ignoredDataIds.ids.filter((id) => lastestDataIds.includes(id));
-        localStorage.setItem('openedDataIds', JSON.stringify(openedDataIds));
-        localStorage.setItem('starredDataIds', JSON.stringify(starredDataIds));    
-        localStorage.setItem('ignoredDataIds', JSON.stringify(ignoredDataIds));
+        updateOpenedDataIds();
+        updateStarredDataIds();
+        updateIgnoredDataIds();
         refreshData();
     });
+}
 
-    // Call the api to get data and return it
-    function callApi(location){
-        return $.ajax({
-            type: 'GET',
-            url: getScrollMsg+location,
-            async: false,
-        });
+function validateLogin() {
+    const un = $('#username').val();
+    const pw = $('#password').val();
+    if (usersList[un] && usersList[un]['pw']) {
+        if (usersList[un]['pw'] == pw) {
+            userDetails = usersList[un]
+            localStorage.setItem('username', un);
+            username = localStorage.getItem('username')
+            localStorage.setItem('password', pw);
+            password = localStorage.getItem('password')
+            callToFetchAllAuctions();
+        } else {
+            var toastHTML = '<span>Invalid Login</span>';
+            M.toast({html: toastHTML, classes: 'rounded blue-grey darken-2 z-depth-5', displayLength: 2000});
+        }
+    } else {
+        var toastHTML = '<span>Invalid Login</span>';
+        M.toast({html: toastHTML, classes: 'rounded blue-grey darken-2 z-depth-5', displayLength: 2000});
     }
+}
 
-    // To loop and call the api method with all locations info
-    function fetchAllAuctions() {
-        locations.map((location) => {
-            $.when(callApi(location)).done(function (data) {
-                if (data && data[0].auction) {
-                    var newAuctions = data[0].auction;
-                    // Push the new auctions recieved from api to the allAuctions
-                    Array.prototype.push.apply(allAuctions, newAuctions);
-                    // Update lastestDataIds with the id of the new auctions
-                    newAuctions.map((newAuction) => {
-                        lastestDataIds.push(newAuction.id);
-                    });
-                }
-            });
+// Call the api to get data and return it
+function callApi(location){
+    return $.ajax({
+        type: 'GET',
+        url: getScrollMsg+location,
+        async: false,
+    });
+}
+
+// To loop and call the api method with all locations info
+function fetchAllAuctions() {
+    locations.map((location) => {
+        $.when(callApi(location)).done(function (data) {
+            if (data && data[0].auction) {
+                var newAuctions = data[0].auction;
+                // Push the new auctions recieved from api to the allAuctions
+                Array.prototype.push.apply(allAuctions, newAuctions);
+                // Update lastestDataIds with the id of the new auctions
+                newAuctions.map((newAuction) => {
+                    lastestDataIds.push(newAuction.id);
+                });
+            }
         });
-    }
+    });
+}
+
+$(document).ready(function () {
+    $('.tabs').tabs(); // To call materialize tabs
+    $('.modal').modal(); // To call materialize modals
+    $('.modal').modal('open'); 
 });

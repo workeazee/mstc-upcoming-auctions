@@ -12,3 +12,16 @@ var lastestDataIds = [];
 var starredDataIds;
 var openedDataIds;
 var ignoredDataIds;
+
+var usersList;
+var userDetails;
+
+var database;
+
+if(!localStorage.getItem('username'))
+    localStorage.setItem('username', '');
+if(!localStorage.getItem('password'))
+    localStorage.setItem('password', '');
+
+var username = localStorage.getItem('username');
+var password = localStorage.getItem('password');
