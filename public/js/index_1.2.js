@@ -18,10 +18,11 @@ function moveToOpened(e){
     var toastHTML = '<span>Link opened in new tab</span>';
     M.toast({html: toastHTML, classes: 'rounded blue-grey darken-2 z-depth-5', displayLength: 2000});
     var auctionId = e.getAttribute('auction-id');
-    if (!openedDataIds.ids.includes(auctionId))
+    if (!openedDataIds.ids.includes(auctionId)) {
         openedDataIds.ids.push(auctionId);
-    updateOpenedDataIds();
-    refreshData();
+        updateOpenedDataIds();
+        refreshData();
+    }
 }
 
 // To update starredDataIds and add to firebase realtime database and refresh data in tables
@@ -29,10 +30,11 @@ function moveToStarred(e){
     var toastHTML = '<span>Moved to starred auctions</span>';
     M.toast({html: toastHTML, classes: 'rounded blue-grey darken-2 z-depth-5', displayLength: 2000});
     var auctionId = e.getAttribute('auction-id');
-    if (!starredDataIds.ids.includes(auctionId))
+    if (!starredDataIds.ids.includes(auctionId)) {
         starredDataIds.ids.push(auctionId);
-    updateStarredDataIds();
-    refreshData();
+        updateStarredDataIds();
+        refreshData();
+    }
 }
 
 // To update ignoredDataIds and add to firebase realtime database and refresh data in tables
@@ -40,10 +42,11 @@ function moveToIgnored(e){
     var toastHTML = '<span>Moved to ignored auctions</span>';
     M.toast({html: toastHTML, classes: 'rounded blue-grey darken-2 z-depth-5', displayLength: 2000});
     var auctionId = e.getAttribute('auction-id');
-    if (!ignoredDataIds.ids.includes(auctionId))
+    if (!ignoredDataIds.ids.includes(auctionId)) {
         ignoredDataIds.ids.push(auctionId);
-    updateIgnoredDataIds();
-    refreshData();
+        updateIgnoredDataIds();
+        refreshData();
+    }
 }
         
 // To update the data of all auctions as per data ids and to call to populate the tables
@@ -206,18 +209,22 @@ function populateIgnoredTableWithData(){
 function callToFetchAllAuctions() {
     $('#modal').modal('close'); 
     $.when(fetchAllAuctions()).then(function() {
-        openedDataIds = userDetails.openedDataIds || {ids: []};
-        starredDataIds = userDetails.starredDataIds || {ids: []};
-        ignoredDataIds = userDetails.ignoredDataIds || {ids: []};
-
-        // Clean up firebase realtime database if id is not present in current data auctions
-        openedDataIds.ids = openedDataIds.ids.filter((id) => lastestDataIds.includes(id));
-        starredDataIds.ids = starredDataIds.ids.filter((id) => lastestDataIds.includes(id));
-        ignoredDataIds.ids = ignoredDataIds.ids.filter((id) => lastestDataIds.includes(id));
-        updateOpenedDataIds();
-        updateStarredDataIds();
-        updateIgnoredDataIds();
-        refreshData();
+        if (lastestDataIds.length > 0) {
+            openedDataIds = userDetails.openedDataIds || {ids: []};
+            starredDataIds = userDetails.starredDataIds || {ids: []};
+            ignoredDataIds = userDetails.ignoredDataIds || {ids: []};
+    
+            // Clean up firebase realtime database if id is not present in current data auctions
+            openedDataIds.ids = openedDataIds.ids.filter((id) => lastestDataIds.includes(id));
+            starredDataIds.ids = starredDataIds.ids.filter((id) => lastestDataIds.includes(id));
+            ignoredDataIds.ids = ignoredDataIds.ids.filter((id) => lastestDataIds.includes(id));
+            if (isLoggedIn) {
+                updateOpenedDataIds();
+                updateStarredDataIds();
+                updateIgnoredDataIds();
+                refreshData();
+            }
+        }
     });
 }
 
@@ -226,6 +233,7 @@ function validateLogin() {
     const pw = $('#password').val();
     if (usersList[un] && usersList[un]['pw']) {
         if (usersList[un]['pw'] == pw) {
+            isLoggedIn = true;
             userDetails = usersList[un]
             localStorage.setItem('username', un);
             username = localStorage.getItem('username')

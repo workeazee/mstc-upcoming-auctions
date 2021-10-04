@@ -18,6 +18,8 @@ var userDetails;
 
 var database;
 
+var isLoggedIn;
+
 if(!localStorage.getItem('username'))
     localStorage.setItem('username', '');
 if(!localStorage.getItem('password'))

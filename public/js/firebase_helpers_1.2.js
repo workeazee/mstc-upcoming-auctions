@@ -5,6 +5,7 @@ function checkIfPreviouslyLoggedIn() {
     if (usersList[username] && usersList[username]['pw']) {
       userDetails = usersList[username]
       if (usersList[username]['pw'] == password){
+        isLoggedIn = true;
         callToFetchAllAuctions();
       }
     }
