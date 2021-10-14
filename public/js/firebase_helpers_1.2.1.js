@@ -1,5 +1,12 @@
 import { ref, update } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-database.js";
 
+function saveToDatabase(){
+  updateOpenedDataIds();
+  updateStarredDataIds();
+  updateIgnoredDataIds();
+  location.reload();
+}
+
 function checkIfPreviouslyLoggedIn() {
   if(username) {
     if (usersList[username] && usersList[username]['pw']) {
@@ -28,6 +35,7 @@ function updateIgnoredDataIds() {
   });
 }
 
+window.saveToDatabase = saveToDatabase;
 window.checkIfPreviouslyLoggedIn = checkIfPreviouslyLoggedIn;
 window.updateOpenedDataIds = updateOpenedDataIds;
 window.updateStarredDataIds = updateStarredDataIds;

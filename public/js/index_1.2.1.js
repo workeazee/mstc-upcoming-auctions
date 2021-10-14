@@ -20,7 +20,7 @@ function moveToOpened(e){
     var auctionId = e.getAttribute('auction-id');
     if (!openedDataIds.ids.includes(auctionId)) {
         openedDataIds.ids.push(auctionId);
-        updateOpenedDataIds();
+        // updateOpenedDataIds();
         refreshData();
     }
 }
@@ -32,7 +32,7 @@ function moveToStarred(e){
     var auctionId = e.getAttribute('auction-id');
     if (!starredDataIds.ids.includes(auctionId)) {
         starredDataIds.ids.push(auctionId);
-        updateStarredDataIds();
+        // updateStarredDataIds();
         refreshData();
     }
 }
@@ -44,7 +44,7 @@ function moveToIgnored(e){
     var auctionId = e.getAttribute('auction-id');
     if (!ignoredDataIds.ids.includes(auctionId)) {
         ignoredDataIds.ids.push(auctionId);
-        updateIgnoredDataIds();
+        // updateIgnoredDataIds();
         refreshData();
     }
 }
@@ -219,9 +219,9 @@ function callToFetchAllAuctions() {
             starredDataIds.ids = starredDataIds.ids.filter((id) => lastestDataIds.includes(id));
             ignoredDataIds.ids = ignoredDataIds.ids.filter((id) => lastestDataIds.includes(id));
             if (isLoggedIn) {
-                updateOpenedDataIds();
-                updateStarredDataIds();
-                updateIgnoredDataIds();
+                // updateOpenedDataIds();
+                // updateStarredDataIds();
+                // updateIgnoredDataIds();
                 refreshData();
             }
         }
