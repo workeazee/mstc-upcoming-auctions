@@ -2,10 +2,12 @@ var allAuctions = []; // Array of all auctions retrieved from mstc endpoint
 var latestAuctions = []; // Array of allAuctions minus the starred and ignored auctions
 var starredAuctions = []; // Array of starred auctions
 var ignoredAuctions = []; // Array of ignored auctions
+var defaultIgnoredAuctions = []; // Array of default ignored auctions
 
 var latestAuctionTable; // Ref to latestAuctionTable
 var starredAuctionTable; // Ref to starredAuctionTable
 var ignoredAuctionTable; // Ref to ignoredAuctionTable
+var defaultIgnoredAuctionTable; // Ref to defaultIgnoredAuctionTable
 
 // To stop the loader
 function stopLoader() {
@@ -51,13 +53,26 @@ function moveToIgnored(e){
         
 // To update the data of all auctions as per data ids and to call to populate the tables
 function refreshData(){
-    latestAuctions = allAuctions.filter((auction) => !(starredDataIds.ids.includes(auction.id) || ignoredDataIds.ids.includes(auction.id)));
     starredAuctions = allAuctions.filter((auction) => starredDataIds.ids.includes(auction.id));
     ignoredAuctions = allAuctions.filter((auction) => ignoredDataIds.ids.includes(auction.id));
+    latestAuctions = allAuctions.filter((auction) => !(starredDataIds.ids.includes(auction.id) || ignoredDataIds.ids.includes(auction.id)));
+
+    latestAuctions.map((auction) => {
+        if (defaultIgnoreContents.some((content) => auction.text.toUpperCase().includes(content.toUpperCase()))) {
+            defaultIgnoredDataIds.ids.push(auction.id);
+            ignoredDataIds.ids.push(auction.id);
+            defaultIgnoredAuctions.push(auction);
+        }
+    });
+    ignoredAuctions = allAuctions.filter((auction) => ignoredDataIds.ids.includes(auction.id));
+    latestAuctions = allAuctions.filter((auction) => !(starredDataIds.ids.includes(auction.id) || ignoredDataIds.ids.includes(auction.id)));
+
     stopLoader();
+
     populateLatestTableWithData();
     populateStarredTableWithData();
     populateIgnoredTableWithData();
+    populateDefaultIgnoredTableWithData();
 }
 
 // To populate the latest auctions table
@@ -176,7 +191,59 @@ function populateIgnoredTableWithData(){
                 className: 'link-to-auction',
                 data: null,
                 render: function(data, type, full, meta){
-                    if (openedDataIds.ids.includes(data.id))
+                    if (defaultIgnoredDataIds.ids.includes(data.id) && !openedDataIds.ids.includes(data.id))
+                        return '<a auction-id='+data.id+' href="'+auctionDetailsLink+data.id+'" target="_blank" onclick="moveToOpened(this);"><i class="material-icons new-release">new_releases</i><i class="material-icons new-release">highlight_off</i>'+data.text+'</a>';
+                    else if (defaultIgnoredDataIds.ids.includes(data.id))
+                        return '<a auction-id='+data.id+' href="'+auctionDetailsLink+data.id+'" target="_blank" onclick="moveToOpened(this);"><i class="material-icons new-release">highlight_off</i>'+data.text+'</a>';
+                    else if (openedDataIds.ids.includes(data.id))
+                        return '<a auction-id='+data.id+' href="'+auctionDetailsLink+data.id+'" target="_blank" onclick="moveToOpened(this);">'+data.text+'</a>';
+                    else
+                        return '<a auction-id='+data.id+' href="'+auctionDetailsLink+data.id+'" target="_blank" onclick="moveToOpened(this);"><i class="material-icons new-release">new_releases</i>'+data.text+'</a>';
+                }
+            },
+            { 
+                data: 'region',
+                visible: false
+            },
+            { data: 'OFF_NAME' },
+            {
+                className: 'opening',
+                data: null,
+                render: function(data, type, full, meta){
+                    return moment(data.opening.replace("::", " "), "DD/MM/YYYY hh:mm:ss").format();
+                }
+            },
+            {
+                className: 'closing-time',
+                data: null,
+                render: function(data, type, full, meta){
+                    return moment(data.Closing.replace("::", " "), "DD/MM/YYYY hh:mm:ss").format();
+                }
+            },
+            { data: 'id' }
+        ]
+    });
+}
+
+// To populate the default ignored auctions table
+function populateDefaultIgnoredTableWithData(){
+    if(defaultIgnoredAuctionTable)
+        defaultIgnoredAuctionTable.destroy();
+    defaultIgnoredAuctionTable = $('#defaultIgnoredDataTable').DataTable({
+        data: defaultIgnoredAuctions,
+        autoWidth: false,
+        pageLength: 100,
+        order: [[4, 'asc']],
+        columns: [
+            {
+                className: 'link-to-auction',
+                data: null,
+                render: function(data, type, full, meta){
+                    if (defaultIgnoredDataIds.ids.includes(data.id) && !openedDataIds.ids.includes(data.id))
+                        return '<a auction-id='+data.id+' href="'+auctionDetailsLink+data.id+'" target="_blank" onclick="moveToOpened(this);"><i class="material-icons new-release">new_releases</i><i class="material-icons new-release">highlight_off</i>'+data.text+'</a>';
+                    else if (defaultIgnoredDataIds.ids.includes(data.id))
+                        return '<a auction-id='+data.id+' href="'+auctionDetailsLink+data.id+'" target="_blank" onclick="moveToOpened(this);"><i class="material-icons new-release">highlight_off</i>'+data.text+'</a>';
+                    else if (openedDataIds.ids.includes(data.id))
                         return '<a auction-id='+data.id+' href="'+auctionDetailsLink+data.id+'" target="_blank" onclick="moveToOpened(this);">'+data.text+'</a>';
                     else
                         return '<a auction-id='+data.id+' href="'+auctionDetailsLink+data.id+'" target="_blank" onclick="moveToOpened(this);"><i class="material-icons new-release">new_releases</i>'+data.text+'</a>';
@@ -213,6 +280,7 @@ function callToFetchAllAuctions() {
             openedDataIds = userDetails.openedDataIds || {ids: []};
             starredDataIds = userDetails.starredDataIds || {ids: []};
             ignoredDataIds = userDetails.ignoredDataIds || {ids: []};
+            defaultIgnoredDataIds = {ids: []};
     
             // Clean up firebase realtime database if id is not present in current data auctions
             openedDataIds.ids = openedDataIds.ids.filter((id) => lastestDataIds.includes(id));
