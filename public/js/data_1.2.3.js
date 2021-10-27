@@ -55,4 +55,17 @@ const defaultIgnoreContents = ['FOREST',
                                 'LKO/UTTAR PRADESH',
                                 'JPR/DEO',
                                 'INDUS TOWERS',
-                                'GEOLOGY AND MINING'];
+                                'GEOLOGY AND MINING',
+                                'POSTS',
+                                'TRANPORT',
+                                'PUNJAB ROADWAYS',
+                                'TIMBER',
+                                'TRAFFIC',
+                                'FOOD CORPORATION',
+                                'INSURANCE',
+                                'DOORDARSHAN',
+                                'VIDYALAYA',
+                                'SEEDS',
+                                'HEALTH',
+                                'GEOLOGY'
+                                ];
