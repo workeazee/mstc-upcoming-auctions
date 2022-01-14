@@ -34,6 +34,9 @@ function moveToStarred(e){
     var auctionId = e.getAttribute('auction-id');
     if (!starredDataIds.ids.includes(auctionId)) {
         starredDataIds.ids.push(auctionId);
+        if(ignoredDataIds.ids.includes(auctionId)) {
+            ignoredDataIds.ids = ignoredDataIds.ids.filter((auctionID) => auctionID!=auctionId);
+        }
         // updateStarredDataIds();
         refreshData();
     }
@@ -46,6 +49,9 @@ function moveToIgnored(e){
     var auctionId = e.getAttribute('auction-id');
     if (!ignoredDataIds.ids.includes(auctionId)) {
         ignoredDataIds.ids.push(auctionId);
+        if(starredDataIds.ids.includes(auctionId)) {
+            starredDataIds.ids = starredDataIds.ids.filter((auctionID) => auctionID!=auctionId);
+        }
         // updateIgnoredDataIds();
         refreshData();
     }
@@ -172,7 +178,14 @@ function populateStarredTableWithData(){
                     return moment(data.Closing.replace("::", " "), "DD/MM/YYYY hh:mm:ss").format();
                 }
             },
-            { data: 'id' }
+            { data: 'id' },
+            {
+                className: 'ignore',
+                data: null,
+                render: function(data, type, full, meta){
+                    return '<button auction-id='+data.id+' class="btn waves-effect btn-danger pull-right red darken-3" onclick="moveToIgnored(this);"><i class="material-icons center">delete_sweep</button>';
+                }
+            }
         ]
     });
 }
@@ -220,7 +233,14 @@ function populateIgnoredTableWithData(){
                     return moment(data.Closing.replace("::", " "), "DD/MM/YYYY hh:mm:ss").format();
                 }
             },
-            { data: 'id' }
+            { data: 'id' },
+            {
+                className: 'star',
+                data: null,
+                render: function(data, type, full, meta){
+                    return '<button auction-id='+data.id+' class="btn waves-effect btn-danger pull-right green darken-2" onclick="moveToStarred(this);"><i class="material-icons center">star_border</i></button>'
+                }
+            }
         ]
     });
 }
@@ -268,7 +288,14 @@ function populateDefaultIgnoredTableWithData(){
                     return moment(data.Closing.replace("::", " "), "DD/MM/YYYY hh:mm:ss").format();
                 }
             },
-            { data: 'id' }
+            { data: 'id' },
+            {
+                className: 'star',
+                data: null,
+                render: function(data, type, full, meta){
+                    return '<button auction-id='+data.id+' class="btn waves-effect btn-danger pull-right green darken-2" onclick="moveToStarred(this);"><i class="material-icons center">star_border</i></button>'
+                }
+            }
         ]
     });
 }
